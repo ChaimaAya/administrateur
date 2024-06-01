@@ -16,11 +16,9 @@ return new class extends Migration
             $table->string('nom');
             $table->text('description')->nullable();
 
-            // Clé étrangère vers la table "sectors"
             $table->unsignedBigInteger('secteur_id');
             $table->foreign('secteur_id')->references('id')->on('secteurs')->onDelete('cascade');
 
-            // Clé étrangère vers la table "admins"
             $table->unsignedBigInteger('admin_id');
             $table->foreign('admin_id')->references('id')->on('users')->onDelete('cascade');
 

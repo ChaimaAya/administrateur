@@ -31,10 +31,7 @@ class User extends Authenticatable
         return $this->hasMany(Startup::class,'admin_id');
     }
 
-    public function adminSecteurs()
-{
-    return $this->hasMany(adminSecteur::class, 'user_id');
-}
+    
 
     /**
      * The attributes that should be hidden for serialization.
