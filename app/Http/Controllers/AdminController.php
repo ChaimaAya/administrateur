@@ -1,25 +1,23 @@
 <?php
 namespace App\Http\Controllers;
+
 use App\Mail\envoyeemail;
 use App\Models\User;
-use Illuminate\Support\Str;
+use App\Notifications\UserDBNotify;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
-use App\Notifications\UserDBNotify;
-use Illuminate\Support\Facades\Auth;
-
-
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
     public function getAllfondateurs()
     {
         $fondateurs = User::where('type', 'fondateur')->get();
-        return view('Layouts.fondateurs.ListFondateur',['fondateurs'=>$fondateurs]);
+        return view('Layouts.fondateurs.ListFondateur', ['fondateurs' => $fondateurs]);
     }
-
 
     public function createAdmin()
     {
@@ -29,9 +27,9 @@ class AdminController extends Controller
     public function storeAdmin(Request $request)
     {
         $request->validate([
-            'name'    => 'required',
-            'email'  => 'required|email',
-            'type'   => 'required',
+            'name' => 'required',
+            'email' => 'required|email',
+            'type' => 'required',
         ]);
         if (User::where('email', $request->email)->exists()) {
             return redirect()->back()->withErrors(['email' => 'L\'adresse e-mail existe déjà.']);
@@ -40,18 +38,19 @@ class AdminController extends Controller
         $password = Str::random(8);
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'   => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => Hash::make($password),
-            'type'    => $request->type,
+            'type' => $request->type,
         ]);
         Mail::to($user->email)->send(new envoyeemail($user->email, $password));
 
         return redirect()->route('listAdmin')->with('success', 'Ajouté avec succès. Le mot de passe a été envoyé par email.');
     }
-    public function getAllAdmin(){
-        $user=User::where('type','sousAdministrateur')->get();
-        return view('Layouts.sousAdmins.listAdmin',['user'=>$user]);
+    public function getAllAdmin()
+    {
+        $user = User::where('type', 'sousAdministrateur')->get();
+        return view('Layouts.sousAdmins.listAdmin', ['user' => $user]);
     }
     public function deleteAdmin($id)
     {
@@ -67,9 +66,10 @@ class AdminController extends Controller
             return redirect()->route('listAdmin')->with('messageError', 'Échec de la suppression du administrateur.');
         }
     }
-    public function editMidifier($id){
-        $user=User::find($id);
-        return view('Layouts.sousAdmins.modifierAdmin',['user'=>$user]);
+    public function editMidifier($id)
+    {
+        $user = User::find($id);
+        return view('Layouts.sousAdmins.modifierAdmin', ['user' => $user]);
     }
     public function updateSousAdmin(Request $request, $id)
     {
@@ -77,7 +77,7 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => 'required',
-            'email' => 'required|email'
+            'email' => 'required|email',
         ]);
 
         $name = $request->name;
@@ -87,7 +87,7 @@ class AdminController extends Controller
         $user->update([
             'name' => $name,
             'email' => $email,
-            'password' => Hash::make($password)
+            'password' => Hash::make($password),
         ]);
 
         Mail::to($user->email)->send(new envoyeemail($user->email, $password));
@@ -95,17 +95,12 @@ class AdminController extends Controller
         return redirect()->route('listAdmin')->with('success', 'Modifié avec succès. Le mot de passe a été envoyé par email.');
     }
 
-
-
-
-
-
     public function show($id)
     {
         $fondateur = User::findOrFail($id);
         $startups = $fondateur->startups()->get();
 
-        if($startups->isEmpty()) {
+        if ($startups->isEmpty()) {
             $startups = null;
         }
 
@@ -117,12 +112,12 @@ class AdminController extends Controller
         $investisseur = User::findOrFail($id);
         $secteursInteret = optional($investisseur->adminSecteur)->pluck('secteur->nom');
 
-        return view('Layouts.investisseur.showinvestisseur', ['investisseur' => $investisseur,'secteursInteret' => $secteursInteret]);
+        return view('Layouts.investisseur.showinvestisseur', ['investisseur' => $investisseur, 'secteursInteret' => $secteursInteret]);
     }
     public function getAllinvestisseur()
     {
-        $investisseur=User::where('type','investisseur')->get();
-        return view('Layouts.investisseur.Listinvestisseur',['investisseur'=>$investisseur]);
+        $investisseur = User::where('type', 'investisseur')->get();
+        return view('Layouts.investisseur.Listinvestisseur', ['investisseur' => $investisseur]);
     }
     public function edit()
     {
@@ -150,7 +145,7 @@ class AdminController extends Controller
         // Vérifier si une nouvelle image a été téléchargée
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
             $path = 'images/profile';
             $file->move($path, $filename);
             // Mettre à jour l'image uniquement si une nouvelle image a été téléchargée
@@ -163,7 +158,6 @@ class AdminController extends Controller
         return redirect()->route('profile')->with('success', 'Profile updated successfully');
     }
 
-
     public function deletefondateur($id)
     {
         try {
@@ -173,7 +167,7 @@ class AdminController extends Controller
                 $operation = 'deleteFondateur';
 
                 $utilisateursANotifier = User::where('id', '!=', Auth::id())->get();
-                Notification::send($utilisateursANotifier, new UserDBNotify($fondateur,$operation));
+                Notification::send($utilisateursANotifier, new UserDBNotify($fondateur, $operation));
                 return redirect()->route('ListFondateur')->with('messageSuccess', 'Fondateur supprimé avec succès.');
             } else {
                 return redirect()->route('ListFondateur')->with('messageError', 'Opération invalide. Pas un fondateur.');
@@ -192,7 +186,7 @@ class AdminController extends Controller
                 $operation = 'deleteInvestisseur';
 
                 $utilisateursANotifier = User::where('id', '!=', Auth::id())->get();
-                Notification::send($utilisateursANotifier, new UserDBNotify($investissor,$operation));
+                Notification::send($utilisateursANotifier, new UserDBNotify($investissor, $operation));
                 return redirect()->route('ListInvestisseur')->with('messageSuccess', 'Investisseur supprimé avec succès.');
             } else {
                 return redirect()->route('ListInvestisseur')->with('messageError', 'Opération invalide. Pas un investisseur.');
@@ -201,6 +195,5 @@ class AdminController extends Controller
             return redirect()->route('ListInvestisseur')->with('messageError', 'Échec de la suppression de linvestisseur.');
         }
     }
-
 
 }

@@ -136,7 +136,6 @@
                                     scales: {
                                         y: {
                                             beginAtZero: true,
-                                            // Réglez le pas de l'axe y à 10 pour afficher les nombres par intervalles de 10
                                             stepSize: 10
                                         }
                                     }

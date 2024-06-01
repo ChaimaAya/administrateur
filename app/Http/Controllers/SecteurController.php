@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\SecteurCreated;
-use Illuminate\Support\Facades\Notification;
-
-
-use App\Models\Secteur;
 use App\Events\SecteurEvent;
-
+use App\Models\Secteur;
 use App\Models\User;
 use App\Notifications\SecteurDBNotify;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class SecteurController extends Controller
 {
@@ -21,8 +17,8 @@ class SecteurController extends Controller
      */
     public function index()
     {
-        $secteurs=Secteur::all();
-        return view('Layouts.secteur.ListSecteur',['secteurs' => $secteurs]);
+        $secteurs = Secteur::all();
+        return view('Layouts.secteur.ListSecteur', ['secteurs' => $secteurs]);
     }
 
     /**
@@ -39,17 +35,17 @@ class SecteurController extends Controller
     public function store(Request $request)
     {
         // dd($request->nom);
-        $nom=$request->nom;
+        $nom = $request->nom;
 
         $request->validate([
-            'nom'=>'required',
+            'nom' => 'required',
 
         ]);
         $secteur = Secteur::create([
-            'nom' => $request->nom
+            'nom' => $request->nom,
         ]);
-        $data=[
-            'nom'=>$nom
+        $data = [
+            'nom' => $nom,
 
         ];
         $operation = 'create';
@@ -58,9 +54,8 @@ class SecteurController extends Controller
         $secteurs = Secteur::latest()->first();
         // event(new SecteurEvent($secteur, 'create'));
 
-
-        Notification::send($utilisateursANotifier,new SecteurDBNotify($secteurs,$operation));
-        return redirect()->route('ListSecteur')->with('success','ajouter avec succès');
+        Notification::send($utilisateursANotifier, new SecteurDBNotify($secteurs, $operation));
+        return redirect()->route('ListSecteur')->with('success', 'ajouter avec succès');
     }
 
     /**
@@ -74,11 +69,11 @@ class SecteurController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit( $id)
+    public function edit($id)
     {
-        $secteurs=Secteur::find($id);
+        $secteurs = Secteur::find($id);
         // dd($secteurs);
-        return view('Layouts.secteur.ModifierSecteur',['secteurs'=>$secteurs]);
+        return view('Layouts.secteur.ModifierSecteur', ['secteurs' => $secteurs]);
     }
 
     /**
@@ -86,23 +81,23 @@ class SecteurController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $secteurs=Secteur::find($id);
-        $nom=$request->nom;
+        $secteurs = Secteur::find($id);
+        $nom = $request->nom;
 
         $request->validate([
-            'nom'=>'required',
+            'nom' => 'required',
 
         ]);
         $secteurs->update([
-            'nom'=>$nom
+            'nom' => $nom,
         ]);
         $operation = 'update';
 
         $utilisateursANotifier = User::where('id', '!=', Auth::id())->get();
         event(new SecteurEvent($secteurs, 'update'));
 
-        Notification::send($utilisateursANotifier, new SecteurDBNotify($secteurs,$operation));
-        return redirect()->route('ListSecteur')->with('success','modifier avec succès');
+        Notification::send($utilisateursANotifier, new SecteurDBNotify($secteurs, $operation));
+        return redirect()->route('ListSecteur')->with('success', 'modifier avec succès');
     }
 
     /**
@@ -110,7 +105,7 @@ class SecteurController extends Controller
      */
     public function destroy(string $id)
     {
-        $secteurs=Secteur::find($id);
+        $secteurs = Secteur::find($id);
         if ($secteurs) {
             $secteurs->delete();
 
@@ -120,7 +115,7 @@ class SecteurController extends Controller
             // event(new SecteurEvent($secteurs, 'delete'));
 
             Notification::send($utilisateursANotifier, new SecteurDBNotify($secteurs, $operation));
-            return redirect()->route('ListSecteur')->with('success','supprimer avec succès');
+            return redirect()->route('ListSecteur')->with('success', 'supprimer avec succès');
         } else {
             return redirect()->route('ListSecteur')->with('error', 'Le secteur que vous essayez de supprimer n\'existe pas.');
         }
