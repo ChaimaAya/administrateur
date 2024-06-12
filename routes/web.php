@@ -64,6 +64,12 @@ Route::get('/accueil', [HomeController::class,'index'])->name('accueil');
 
 Route::get('/MarkAsRead_all',[NotificationsController::class,'MarkAsRead_all'])->name('MarkAsRead_all');
 Route::get('/markAsRead/{id}', [NotificationsController::class, 'MarkAsRead'])->name('markAsReadId');
+//reclamation
+Route::get('/accepter/{id}',  [ReclamationController::class,'accepter'])->name('accepter');
+Route::get('/refuser/{id}', [ReclamationController::class,'refuser'])->name('refuser');
+Route::get('/resoudre/{id}', [ReclamationController::class,'resoudre'])->name('resoudre');
+Route::delete('/supprimerReclamation/{id}', [ReclamationController::class, 'supprimer'])->name('supprimer');
+
 });
 
 
@@ -84,12 +90,3 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
-
-use App\Http\Controllers\FacebookSocialiteController;
-
-Route::get('auth/facebook', [FacebookSocialiteController::class, 'redirectToFB']);
-Route::get('callback/facebook', [FacebookSocialiteController::class, 'handleCallback']);
-Route::get('/accepter/{id}',  [ReclamationController::class,'accepter'])->name('accepter');
-Route::get('/refuser/{id}', [ReclamationController::class,'refuser'])->name('refuser');
-Route::get('/resoudre/{id}', [ReclamationController::class,'resoudre'])->name('resoudre');
-Route::delete('/supprimerReclamation/{id}', [ReclamationController::class, 'supprimer'])->name('supprimer');

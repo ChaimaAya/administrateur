@@ -52,7 +52,6 @@ class SecteurController extends Controller
 
         $utilisateursANotifier = User::where('id', '!=', Auth::id())->get();
         $secteurs = Secteur::latest()->first();
-        // event(new SecteurEvent($secteur, 'create'));
 
         Notification::send($utilisateursANotifier, new SecteurDBNotify($secteurs, $operation));
         return redirect()->route('ListSecteur')->with('success', 'ajouter avec succès');
@@ -112,7 +111,6 @@ class SecteurController extends Controller
             $operation = 'delete';
 
             $utilisateursANotifier = User::where('id', '!=', Auth::id())->get();
-            // event(new SecteurEvent($secteurs, 'delete'));
 
             Notification::send($utilisateursANotifier, new SecteurDBNotify($secteurs, $operation));
             return redirect()->route('ListSecteur')->with('success', 'supprimer avec succès');

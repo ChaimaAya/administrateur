@@ -133,26 +133,21 @@ class AdminController extends Controller
             'image' => 'sometimes|required|mimes:jpg,png,jpeg',
         ]);
 
-        // Récupérer les valeurs actuelles de l'utilisateur
         $currentName = $admin->name;
         $currentEmail = $admin->email;
         $currentImage = $admin->image;
 
-        // Mettre à jour uniquement les champs qui ont été modifiés
         $admin->name = $request->name;
         $admin->email = $request->email;
 
-        // Vérifier si une nouvelle image a été téléchargée
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '.' . $file->getClientOriginalExtension();
             $path = 'images/profile';
             $file->move($path, $filename);
-            // Mettre à jour l'image uniquement si une nouvelle image a été téléchargée
             $admin->image = $filename;
         }
 
-        // Sauvegarder les modifications
         $admin->save();
 
         return redirect()->route('profile')->with('success', 'Profile updated successfully');

@@ -39,7 +39,6 @@ class HomeController extends Controller
             'nbInvestisseur' => $nbInvestisseur, 'nbSecteurs' => $nbSecteurs, 'statistique' => $statistique,
 
         ]);
-        // return redirect()->route('accueil');
     }
 
 }
